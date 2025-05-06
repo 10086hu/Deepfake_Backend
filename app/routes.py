@@ -1,24 +1,24 @@
 from flask import Blueprint, request, jsonify
+from flask_jwt_extended import create_access_token
 
+from app.encrypt import check_password
 from app.model.user import User
+from app.result import Result
 
 bp = Blueprint('main', __name__)
 
 
 @bp.route('/user/login', methods=['POST'])
 def user_login():
-    # 查询所有用户
-    users = User.query.all()
-
-    # 将用户数据转换为字典格式
-    user_list = [{
-        'id': user.id,
-        'username': user.username,
-        'avatar_url': user.avatar_url,
-        'email': user.email
-    } for user in users]
-
-    return {'users': user_list}
+    username = request.json.get("username", None)
+    password = request.json.get("password", None)
+    user = User.query.filter_by(username=username).first()
+    if user is None:
+        return Result.fail({"content": "用户不存在"})
+    if check_password(password, user.password):
+        return Result.ok({"token": create_access_token(identity=user.id)})
+    else:
+        return Result.fail({"content": "密码错误"})
 
 
 @bp.route('/user/register', methods=['POST'])
