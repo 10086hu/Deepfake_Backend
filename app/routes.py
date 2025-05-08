@@ -1,4 +1,4 @@
-from flask import Blueprint, request,jsonify
+from flask import Blueprint, request, jsonify
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from sqlalchemy.orm import defer
 import os
@@ -9,9 +9,8 @@ from app.model.user import User
 from app.result import Result
 from tool import detection_to_dict
 
-
-
 bp = Blueprint('main', __name__)
+
 
 @bp.route('/user/login', methods=['POST'])
 def user_login():
@@ -85,15 +84,17 @@ def user_info():
 
     return Result.ok({"username": info.username, "avatar_url": info.avatar_url, "email": info.email})
 
-news_bp = Blueprint('news',__name__)
+
+news_bp = Blueprint('news', __name__)
+
 
 @bp.route('/news/detect', methods=['POST'])
 @jwt_required(optional=False)
-def news_detect()->(jsonify,int):
+def news_detect() -> (jsonify, int):
     userid = int(get_jwt_identity())
     file = request.files['image']
     app_dir = os.path.dirname(os.path.abspath(__file__))
-    resource_dir=os.path.join(app_dir.split('app')[0],'resource')
+    resource_dir = os.path.join(app_dir.split('app')[0], 'resource')
 
     os.makedirs(resource_dir, exist_ok=True)
     save_path = os.path.join(resource_dir, file.filename)
@@ -104,10 +105,10 @@ def news_detect()->(jsonify,int):
     if text[0].isdigit():
         result = 1
     try:
-        new_detection = Detection(content = text ,picture_url = save_path , result = result , user_id = userid)
+        new_detection = Detection(content=text, picture_url=save_path, result=result, user_id=userid)
         db.session.add(new_detection)
         db.session.commit()
     except Exception as e:
         db.session.rollback()
-        return Result.fail({'content':e})
-    return Result.ok({'data':result})
+        return Result.fail({'content': e})
+    return Result.ok({'data': result})
