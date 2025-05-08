@@ -1,0 +1,1 @@
+# news pictures dir

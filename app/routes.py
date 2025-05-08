@@ -94,7 +94,7 @@ def news_detect() -> (jsonify, int):
     userid = int(get_jwt_identity())
     file = request.files['image']
     app_dir = os.path.dirname(os.path.abspath(__file__))
-    resource_dir = os.path.join(app_dir.split('app')[0], 'resource')
+    resource_dir = os.path.join(app_dir, 'static/news')
 
     os.makedirs(resource_dir, exist_ok=True)
     save_path = os.path.join(resource_dir, file.filename)
