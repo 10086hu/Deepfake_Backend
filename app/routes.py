@@ -74,6 +74,17 @@ def user_record():
     return Result.ok({"detections": detections_dict})
 
 
+@bp.route('/user/info', methods=['GET'])
+@jwt_required()
+def user_info():
+    id = int(get_jwt_identity())
+    info = User.query.filter_by(id=id).options(defer(User.id), defer(User.password)).first()
+
+    if info is None:
+        return Result.fail({"content": "未查询到用户信息，请重新登录"})
+
+    return Result.ok({"username": info.username, "avatar_url": info.avatar_url, "email": info.email})
+
 news_bp = Blueprint('news',__name__)
 
 @bp.route('/news/detect', methods=['POST'])
