@@ -8,6 +8,8 @@ from app.model.detection import Detection
 from app.model.user import User
 from app.result import Result
 from tool import detection_to_dict
+import os
+from google import genai
 
 bp = Blueprint('main', __name__)
 
@@ -111,4 +113,18 @@ def news_detect() -> (jsonify, int):
     except Exception as e:
         db.session.rollback()
         return Result.fail({'content': e})
-    return Result.ok({'data': result})
+    """
+        You need to apply an API_KEY from url:https://ai.google.dev/gemini-api/docs/quickstart?hl=zh-cn and EXPORT as Gemini_API_Key in the bash environment
+    """
+    api_key=os.environ.get("Gemini_API_Key")
+    client = genai.Client(api_key=api_key)
+    my_file = client.files.upload(file=save_path)
+    ai_response = client.models.generate_content(
+        model="gemini-2.0-flash", contents=[f"you only need to give out a relation coeffient(among 0 - 1) about the following text and the image.'{text}'",my_file]
+    )
+    
+    return Result.ok({'data': ai_response.text})
+
+
+
+print(response.text)
