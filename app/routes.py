@@ -120,11 +120,7 @@ def news_detect() -> (jsonify, int):
     client = genai.Client(api_key=api_key)
     my_file = client.files.upload(file=save_path)
     ai_response = client.models.generate_content(
-        model="gemini-2.0-flash", contents=[f"you only need to give out a relation coeffient(among 0 - 1) about the following text and the image.'{text}'",my_file]
+        model="gemini-2.0-flash", contents=[f"you only need to give out json-format struct which can directly be used as the response data in backend that give out a relation coeffient(among 0 - 1) as coffient and the excuse text as excuse about the following news-text and the image. What you need to pay attention to is that the image is not extraly descirbing what's going on ablout the news-text, but showing the relative people or symbol.'{text}'",my_file]
     )
     
     return Result.ok({'data': ai_response.text})
-
-
-
-print(response.text)
